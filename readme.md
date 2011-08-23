@@ -1,7 +1,7 @@
-Dojo's XHR function, monkey patched
-===================================
+Handle response codes globally with Dojo's xhr()
+================================================
 
-This small js file [monkey patches][monkeypatchwikipedia] the Dojo's original xhr function to globally handle server side responses with different status codes other than 200.
+This small js file [monkey patches][monkeypatchwikipedia] the Dojo's original xhr function to globally and synchronously handle server side responses with different status codes other than 200.
 
 For example, if your server session has timed out, this patch allows you to display a login screen and after a successful authentication to automatically re-send the original xhr call to resume the application without any further interruption.
 
