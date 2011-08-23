@@ -1,7 +1,7 @@
 Dojo's XHR function, monkey patched
 ===================================
 
-This small js file [monkey patches][http://en.wikipedia.org/wiki/Monkey_patch] the Dojo's original xhr function to globally handle server side responses with different status codes other than 200.
+This small js file [monkey patches][monkeypatchwikipedia] the Dojo's original xhr function to globally handle server side responses with different status codes other than 200.
 
 For example, if your server session has timed out, this patch allows you to display a login screen and after a successful authentication to automatically re-send the original xhr call to resume the application without any further interruption.
 
@@ -51,6 +51,9 @@ You can handle 401s, but also any 5xx code for example. If you cannot resume nor
 Contact / Licence
 -----------------
 
-If you find any bugs or have any suggestions, please do not hesitate to drop me an [email][mailto:manuel@zamora.de].
+If you find any bugs or have any suggestions, please do not hesitate to drop me an [email][].
 
 This code is licenced under the terms of LGPL Version 3.
+
+[monkeypatchwikipedia]: http://en.wikipedia.org/wiki/Monkey_patch
+[email]: mailto:manuel@zamora.de
