@@ -26,6 +26,10 @@ dojo.xhr = function(method, args, hasBody) {
     var state = "first"
     var deferredForCaller = new dojo.Deferred()
 
+    // store ioargs in deferredForCaller to fix several dojo stores
+    // (eg. dojox.data.JsonRestStore)
+    deferredForCaller.ioArgs = args
+
     // which response codes should we handle
     var handleCodeArray = []
     for (code in dojo._handleXhrStatus) {
@@ -35,12 +39,47 @@ dojo.xhr = function(method, args, hasBody) {
     if (handleCodeArray.length > dojo._handleWhichXhrResponseCodes.length)
         dojo._handleWhichXhrResponseCodes = handleCodeArray
 
+    // use handle from xhr object to always receive the ioargs object
+    // this will be unnecessary in dojo 1.7, as then the xhr object will be
+    // returned via the deferred
+    //
+    // TODO: call handle function when resolving/rejecting deferredForCaller
+    //
+    args._handle = args.handle
+    args.handle = function(response, ioargs) {
+
+        // update ioargs in deferredForCaller with current value
+        deferredForCaller.ioArgs = ioargs
+
+        if (ioargs.xhr.status >= 200 && ioargs.xhr.status <= 299) {
+            deferredForCaller.resolve(response)
+
+            // also call return handle
+            if (typeof(args._handle) == "function") {
+                args._handle(response, ioargs) 
+            }
+        }
+        else {
+            response.ioargs = ioargs 
+
+            try {
+                if (ioargs.handleAs == "json") {
+                    ioargs.xhr.responseJson = dojo.fromJson(ioargs.xhr.response) 
+                    response.json = ioargs.xhr.responseJson
+                }
+            } catch (e) {
+                response.ioargs = ioargs
+                handleError(response)
+            }
+            
+            handleError(response)
+        }
+    }
+
     // execute xhr call, on success resolve original deferred, otherwise
     // call the error handler
     var doXhr = function() {
-        dojo._xhr(method, args, hasBody).then(function (result) {
-           deferredForCaller.resolve(result) 
-        }, handleError)
+        dojo._xhr(method, args, hasBody)
     }
 
     // handle the xhr error. if a handle function is supplied, otherwise
